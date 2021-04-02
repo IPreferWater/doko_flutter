@@ -63,7 +63,7 @@ class _PostsScreenState extends State<PostsScreen> {
       Column(
           children: <Widget>[
     FloatingActionButton(
-    child: Icon(Icons.send),
+    child: Icon(Icons.add),
     heroTag: "sendPostBtn",
     onPressed: () async {
     Post post = await showDialog(
@@ -72,7 +72,28 @@ class _PostsScreenState extends State<PostsScreen> {
     PostFormDialog());
     int id = await _postRepository.insertPost(post);
     print("postInserted $id");
-    })]);
+    }),
+            FloatingActionButton(
+
+                child: Icon(Icons.send),
+                heroTag: "sendAllPostsBtn",
+                onPressed: () async {
+                  List <Post> posts = await _postRepository.getAllPost();
+                  Map<String, dynamic> cheat = new Map<String,dynamic>();
+                  String mutationStr = """
+                   mutation CreatePosts(\$newposts: [InputPost!]!) {
+  createPosts(input: \$newposts)
+}
+""";
+
+            cheat["newposts"]=posts[0].toMap();
+                  QueryResult queryResult = await client.query(
+                    QueryOptions(documentNode: gql(mutationStr), variables: cheat),
+                  );
+                  print(queryResult.data);
+                  print(queryResult.exception);
+                })
+          ]);
     }
   }
 
