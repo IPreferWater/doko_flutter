@@ -62,7 +62,6 @@ class _PostsScreenState extends State<PostsScreen> {
     return
       Column(
           children: <Widget>[
-          _gpsWidget(),
     FloatingActionButton(
     child: Icon(Icons.send),
     heroTag: "sendPostBtn",
@@ -77,74 +76,9 @@ class _PostsScreenState extends State<PostsScreen> {
     }
   }
 
-  Widget _gpsWidget() {
-    TextField latitudeTextField = TextField(
-      controller: new TextEditingController(text: ""),
-      decoration: new InputDecoration(labelText: "latitude"),
-      keyboardType: TextInputType.number,
-    );
 
-    TextField longitudeTextField = TextField(
-      controller: new TextEditingController(text: ""),
-      decoration: new InputDecoration(labelText: "longitude"),
-      keyboardType: TextInputType.number,
-    );
-    return Column(
-        children: <Widget>[
-          latitudeTextField,
-          longitudeTextField,
-          FloatingActionButton(
-              child: Icon(Icons.gps_fixed),
-              heroTag: "getLocationBtn",
-              onPressed: () async {
-                Position p = await _determinePosition();
-                latitudeTextField.controller.text = p.latitude.toString();
-                longitudeTextField.controller.text = p.longitude.toString();
-              })
-        ]);
-  }
 
-  /// Determine the current position of the device.
-  ///
-  /// When the location services are not enabled or permissions
-  /// are denied the `Future` will return an error.
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
-        // Permissions are denied forever, handle appropriately.
-        return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
-      }
-
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error(
-            'Location permissions are denied');
-      }
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
-  }
 
 //TODO: client should be injected
   Future _testGraphQl(GraphQLClient client) async {
