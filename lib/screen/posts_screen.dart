@@ -21,11 +21,11 @@ class _PostsScreenState extends State<PostsScreen> {
 
   @override
   void initState() {
-    tttt();
+    init();
     super.initState();
   }
 
-  void tttt() async {
+  void init() async {
     String token = await storage.read(key: 'token');
     print(token);
     if (token.isEmpty) {
@@ -79,19 +79,27 @@ class _PostsScreenState extends State<PostsScreen> {
                 heroTag: "sendAllPostsBtn",
                 onPressed: () async {
                   List <Post> posts = await _postRepository.getAllPost();
-                  Map<String, dynamic> cheat = new Map<String,dynamic>();
                   String mutationStr = """
                    mutation CreatePosts(\$newposts: [InputPost!]!) {
   createPosts(input: \$newposts)
 }
 """;
+                  dynamic variablesJson =  posts.map((post) => post.toMap()).toList(growable: false);
 
-            cheat["newposts"]=posts[0].toMap();
+                  final variable ={
+                    "newposts":variablesJson
+                  };
+
                   QueryResult queryResult = await client.query(
-                    QueryOptions(documentNode: gql(mutationStr), variables: cheat),
+                    QueryOptions(documentNode: gql(mutationStr), variables: variable),
                   );
-                  print(queryResult.data);
-                  print(queryResult.exception);
+                  if (queryResult.hasException){
+                    //TODO
+                    print(queryResult.exception);
+                    return;
+                  }
+                  //TODO
+                  //delete all from sembast
                 })
           ]);
     }
