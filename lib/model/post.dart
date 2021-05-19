@@ -26,4 +26,5 @@ class Post {
       longitude: map['longitude'],
     );
   }
+
 }

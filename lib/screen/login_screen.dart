@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_doko/screen/posts_screen.dart';
+import 'package:flutter_doko/widget/drop_down_type_sending.dart';
 import 'package:http/http.dart' as http;
 
 import '../main.dart';
@@ -13,17 +14,34 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
+
     super.initState();
   }
 
+  //TODO get shared preference
+  String sendingType = 'graphql';
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Authentication'),
         actions: <Widget>[],
       ),
-      body: _loginScreen(),
+      body: Column(children: <Widget>[
+        DropDownTypeSending(
+          onCountSelected: (String s) {
+            setState(() {
+              sendingType = s;
+            });
+          },
+        ),
+
+    if (sendingType == 'graphql')
+    _loginScreen()
+
+      ]),
     );
   }
 
@@ -74,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<bool> login(String username, String password) async {
+
     var url = Uri.parse('https://10.0.2.2:8000/login');
     final body = jsonEncode({"username": username, "password": password});
     var response = await http
