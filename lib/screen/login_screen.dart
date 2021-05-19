@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_doko/screen/mail_screen.dart';
 import 'package:flutter_doko/screen/posts_screen.dart';
+import 'package:flutter_doko/screen/sms_screen.dart';
 import 'package:flutter_doko/widget/drop_down_type_sending.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 
@@ -12,18 +15,41 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  @override
-  void initState() {
 
+  String sendingType = '';
+
+  @override initState()  {
+    initSendingType();
     super.initState();
   }
 
-  //TODO get shared preference
-  String sendingType = 'graphql';
+  initSendingType() async {
+    String sendingTypeFromSharedPrefs = await getStringValuesSF();
+    setState(() {
+      sendingType = sendingTypeFromSharedPrefs;
+    });
+  }
+
+  Future<String> getStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String s = prefs.getString('sending_type');
+    print('sending_type found is $s');
+    if (s == null) {
+      return 'graphql';
+    }
+    return s;
+  }
+
+  Future<void> setStringValuesSF() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('sending_type', sendingType);
+    print('new sending_type is $sendingType');
+  }
+
 
   @override
   Widget build(BuildContext context) {
-
+print("rebuild!!!!! with $sendingType");
     return Scaffold(
       appBar: AppBar(
         title: Text('Authentication'),
@@ -31,18 +57,72 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Column(children: <Widget>[
         DropDownTypeSending(
+          value: sendingType,
           onCountSelected: (String s) {
             setState(() {
               sendingType = s;
             });
+            setStringValuesSF();
           },
         ),
 
-    if (sendingType == 'graphql')
-    _loginScreen()
+        getWidgetToDisplay()
+
+
+
+
 
       ]),
     );
+  }
+
+Widget getWidgetToDisplay(){
+  switch(sendingType) {
+    case 'graphql': {
+      return _loginScreen();
+    }
+    break;
+
+    case 'sms': {
+      return _sms();
+    }
+    break;
+
+    case 'mail': {
+      return _mail();
+    }
+    break;
+
+    default: {
+      return Text("loading");
+    }
+    break;
+  }
+}
+  Widget _sms() {
+    return  FloatingActionButton(
+        child: Icon(Icons.check),
+        heroTag: "smsBtn",
+        onPressed: () {
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SmsScreen()),
+          );
+        });
+  }
+
+  Widget _mail() {
+    return  FloatingActionButton(
+        child: Icon(Icons.check),
+        heroTag: "smsBtn",
+        onPressed: () {
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MailScreen()),
+          );
+        });
   }
 
   Widget _loginScreen() {

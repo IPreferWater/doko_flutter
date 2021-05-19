@@ -2,21 +2,23 @@ import 'package:flutter/material.dart';
 
 class DropDownTypeSending extends StatefulWidget {
    final Function(String) onCountSelected;
+   final String value;
 
-  const DropDownTypeSending({Key key, this.onCountSelected}) : super(key: key);
+
+  const DropDownTypeSending({Key key, this.onCountSelected, @required this.value}) : super(key: key);
 
   @override
   State<DropDownTypeSending> createState() => DropDownTypeSendingState();
 }
 
 class DropDownTypeSendingState extends State<DropDownTypeSending> {
-  //TODO: get shared preference
-  String dropdownValue = 'graphql';
+  String dropdownValue;
 
   @override
   Widget build(BuildContext context) {
+    dropdownValue = widget.value;
     return DropdownButton<String>(
-      value: dropdownValue,
+      value: widget.value,
       icon: const Icon(Icons.arrow_downward),
       iconSize: 24,
       elevation: 16,
@@ -31,7 +33,7 @@ class DropDownTypeSendingState extends State<DropDownTypeSending> {
         });
         widget.onCountSelected(newValue);
       },
-      items: <String>['graphql', 'sms', 'mail']
+      items: <String>['','graphql', 'sms', 'mail']
           .map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
