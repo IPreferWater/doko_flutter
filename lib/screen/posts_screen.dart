@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doko/db/post_repository_abstract.dart';
 import 'package:flutter_doko/model/post.dart';
 import 'package:flutter_doko/widget/post_form_dialog.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
 import 'package:graphql/client.dart';
 
@@ -72,6 +71,9 @@ class _PostsScreenState extends State<PostsScreen> {
     PostFormDialog());
     int id = await _postRepository.insertPost(post);
     print("postInserted $id");
+
+
+
     }),
             FloatingActionButton(
 
@@ -79,6 +81,7 @@ class _PostsScreenState extends State<PostsScreen> {
                 heroTag: "sendAllPostsBtn",
                 onPressed: () async {
                   List <Post> posts = await _postRepository.getAllPost();
+                  print(posts[0].toString());
                   String mutationStr = """
                    mutation CreatePosts(\$newposts: [InputPost!]!) {
   createPosts(input: \$newposts)
@@ -89,6 +92,8 @@ class _PostsScreenState extends State<PostsScreen> {
                   final variable ={
                     "newposts":variablesJson
                   };
+
+                  print(variable);
 
                   QueryResult queryResult = await client.query(
                     QueryOptions(documentNode: gql(mutationStr), variables: variable),
@@ -104,10 +109,6 @@ class _PostsScreenState extends State<PostsScreen> {
           ]);
     }
   }
-
-
-
-
 
 //TODO: client should be injected
   Future _testGraphQl(GraphQLClient client) async {
